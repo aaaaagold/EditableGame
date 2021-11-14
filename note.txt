@@ -1,0 +1,47 @@
+把別人的遊戲改得更好玩之後，竟然還要重新打包才能給朋友玩，還會被原作者計較，真是太麻煩啦！
+
+_______________
+
+
+玩家修改資料
+agreement：
+	玩家同意其他玩家透過此方式對你修改後的遊戲內容進行修改。
+	玩家同意您所新增的圖片、聲音、插件等素材的版權問題僅與您有關，與此遊戲的其他人及其他玩家無關。
+	玩家同意若留下聯絡方式之後，被其他人找麻煩，完全是您自找的。
+	簡單來說：您要給之後的人吃免費的午餐、改後出問題您自己扛。
+提供：
+	1. 修改用資料json的url (as id)
+		用query string的方式提供
+內容：
+	1. 繼承自(原始/其他玩家的json url)
+	2. 修改用javascript的url
+	3. 資料的base address
+格式：
+	{
+		"js":"",
+		"base":"",
+		"resources":[],
+		"databases":[],
+		"from":"",
+		"contact":""
+	}
+	js: 透過一般的http request可以正常存取到內容是javascript的url
+	base: 存取額外增加的資料(地圖、圖片、聲音。其他js的部分自己想辦法document.body.appendChild)的url路徑基底(一種根目錄的感覺)
+	resources: 額外增加的資料的路徑名稱陣列，路徑名稱是在www資料夾中開始的相對路徑，含副檔名。存取到這些檔案時，會路徑前面加上base中的字串。也可以用同樣的路徑名稱，把前一個人的覆蓋掉。
+	databases: 資料庫(www/data底下在遊戲一開始時只讀取一次的東西。所以地圖(MapXXX.json)不是寫在這裡，而是寫在resources)的路徑名稱陣列，每個檔案使用以下格式：
+		{
+			"name":"",
+			"replaceKeys":[]
+		}
+		name: 相對於www/data裡的路徑。會預期該檔案的內容可被JSON.parse。該名稱會掛在window上，若"from"是正整數，則會預期JSON.parse之後是陣列，並從索引=from的地方修改前一個人的資料庫。
+		replaceKeys: 這個屬性丟進if裡面是false的話，會將現有的變數中的屬性，更新成此json中所有屬性。
+			每個元素可以是
+				長度2的>=0的整數陣列來代表區間(左包含，右不包含)。
+				字串來代表取代掉這個屬性。
+		當然你也可以用js來更新資料庫變數。
+	from: 無此key或空字串來代表原始遊戲，或其他玩家的json url
+	contact: 你可能會想讓別人來聯絡你，所以留下了聯絡方式，但你也可能不會想讓別人來聯絡你。
+js執行時機：
+	繼承自的東西除 SceneManager.run(Scene_Boot); 之外，執行結束後，
+	 SceneManager.run(Scene_Boot); 之前
+	
