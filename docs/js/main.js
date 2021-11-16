@@ -41,9 +41,12 @@ let jurl=(url, method, header, data, resType, callback, callback_all_h, timeout_
 	return xhttp;
 };
 
+// parse qs
 
 let qsv=location.search.slice(1).split("&").map(x=>{ let kv=x.split('='); if(kv[1]===undefined) kv[1]=true; return kv; });
 let tbl={}; qsv.forEach(kv=>tbl[kv[0]]=kv[1]);
+
+// load ext jsons
 
 let booted=0,booting=()=>{
 	if(!booted) booted=1;
@@ -81,6 +84,10 @@ let booted=0,booting=()=>{
 			for(let x=jsonv.length,j;x--;){
 				j=jsonv[x];
 				for(let i=0,arr=j.resources;i!==arr.length;++i) mapping.resources[arr[i]]=j.base;
+				for(let i=0,arr=j.databases,obj=mapping.databases;i!==arr.length;++i){
+					if(!obj[arr[i].name]) obj[arr[i].name]=[];
+					obj[arr[i].name].push([j.base,arr[i]]);
+				}
 			}
 			for(let x=jsonv.length,j;x--;){
 				j=jsonv[x];
@@ -90,13 +97,54 @@ let booted=0,booting=()=>{
 	});
 };
 
-p=XMLHttpRequest.prototype;
-k='open';
+// inject mapping
+
+DataManager.loadDataFile = function(name, src){
+	let xhr = new XMLHttpRequest() , url = 'data/' + src , j , arr , onloadParts;
+	if(name==='$dataMap'){
+		let b=mapping.resources[url];
+		if(b) url=b+url;
+	}else if(arr=mapping.databases[url]){
+		let cnt=arr.length,tbl=[];
+		onloadParts=(base)=>{
+			if((cnt-=!base) || !j) return;
+			arr.forEach((bi,i)=>{ let r=bi[1].replaceKeys;
+				if(r && r.constructor===Array){
+					for(let x=r[0];x<r[1];++x) j[x]=tbl[i][x];
+				}else j[r]=tbl[i][r];
+			});
+			DataManager.onLoad(window[name]=j);
+		};
+		arr.forEach((bi,i)=>jurl(bi[0]+bi[1].name,"GET",0,0,0,txt=>{
+			tbl[i]=JSON.parse(xhr.responseText);
+			onloadParts();
+		}));
+	}
+	xhr.open('GET', url);
+	xhr.overrideMimeType('application/json');
+	xhr.onload = function() {
+		if (xhr.status < 400) {
+			j = JSON.parse(xhr.responseText);
+			if(onloadParts) onloadParts(1);
+			else DataManager.onLoad(window[name]=j);
+		}
+	};
+	xhr.onerror = this._mapLoader || function() {
+		DataManager._errorUrl = DataManager._errorUrl || url;
+	};
+	window[name] = null;
+	xhr.send();
+};
+
+p=Bitmap;
+k='load';
 r=p[k]; (p[k]=function f(){
-	let arr=arguments,b=mapping.resources[arr[1]];
-	if(b) arr[1]=b+arr[1];
+	let arr=arguments,b=mapping.resources[arr[0]];
+	if(b) arr[0]=b+arr[0];
 	return f.ori.apply(this,arr);
 }).ori=r;
+
+// start
 
 if(tbl.url && tbl.url!==true) addJson(0,decodeURIComponent(tbl.url));
 else window.onload=booting;
