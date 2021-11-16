@@ -1,7 +1,7 @@
 {
 	"js":"https://aaaaagold.github.io/EditableGame/example/js.js",
-	"base":"",
-	"resources":[],
+	"base":"https://aaaaagold.github.io/EditableGame/example/eg1/",
+	"resources":["data/Map001.json"],
 	"databases":[],
 	"from":"",
 	"contact":""
