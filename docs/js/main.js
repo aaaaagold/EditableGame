@@ -108,15 +108,22 @@ DataManager.loadDataFile = function(name, src){
 		let cnt=arr.length,tbl=[];
 		onloadParts=(base)=>{
 			if((cnt-=!base) || !j) return;
-			arr.forEach((bi,i)=>{ let r=bi[1].replaceKeys;
-				if(r && r.constructor===Array){
-					for(let x=r[0];x<r[1];++x) j[x]=tbl[i][x];
-				}else j[r]=tbl[i][r];
-			});
+			for(let i=0,bi,rs,r;i!==arr.length;++i){
+				bi=arr[i];
+				rs=bi[1].replaceKeys;
+				if(rs){
+					for(let ri=0;ri!==rs.length;++ri){
+						r=rs[ri];
+						if(r && r.constructor===Array){
+							for(let x=r[0];x<r[1];++x) j[x]=tbl[i][x];
+						}else j[r]=tbl[i][r];
+					}
+				}else j=tbl[i];
+			}
 			DataManager.onLoad(window[name]=j);
 		};
 		arr.forEach((bi,i)=>jurl(bi[0]+bi[1].name,"GET",0,0,0,txt=>{
-			tbl[i]=JSON.parse(xhr.responseText);
+			tbl[i]=JSON.parse(txt);
 			onloadParts();
 		}));
 	}

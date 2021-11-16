@@ -2,7 +2,16 @@
 	"js":"https://aaaaagold.github.io/EditableGame/example/js.js",
 	"base":"https://aaaaagold.github.io/EditableGame/example/eg1/",
 	"resources":["data/Map001.json"],
-	"databases":[],
+	"databases":[
+		{
+			"name":"data/System.json",
+			"replaceKeys":["partyMembers"]
+		},
+		{
+			"name":"data/Skills.json",
+			"replaceKeys":[[3,11]]
+		}
+	],
 	"from":"",
 	"contact":""
 }
