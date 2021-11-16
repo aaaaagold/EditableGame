@@ -63,7 +63,8 @@ let booted=0,booting=()=>{
 	//script.onerror = this.onError.bind(this);
 	script._url = url;
 	document.body.appendChild(script);
-},addJson=(ori,url)=>{
+},urlv=window.urlv=[],addJson=(ori,url)=>{
+	urlv.push(url);
 	jurl(url,"GET",0,0,0,txt=>{
 		let j;
 		try{
@@ -93,6 +94,8 @@ let booted=0,booting=()=>{
 				j=jsonv[x];
 				if(j.js) putJs(j.js,onloaded);
 			}
+			console.log("Thanks for following external jsons. You can use 'window.urlv' to get them");
+			console.log(urlv);
 		}
 	});
 };
@@ -145,6 +148,14 @@ DataManager.loadDataFile = function(name, src){
 
 p=Bitmap;
 k='load';
+r=p[k]; (p[k]=function f(){
+	let arr=arguments,b=mapping.resources[arr[0]];
+	if(b) arr[0]=b+arr[0];
+	return f.ori.apply(this,arr);
+}).ori=r;
+
+p=WebAudio.prototype;
+k='_load';
 r=p[k]; (p[k]=function f(){
 	let arr=arguments,b=mapping.resources[arr[0]];
 	if(b) arr[0]=b+arr[0];
