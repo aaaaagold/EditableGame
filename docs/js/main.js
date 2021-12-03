@@ -96,7 +96,7 @@ let booted=0,booting=()=>{
 				j=jsonv[x];
 				for(let i=0,arr=j.resources;i!==arr.length;++i){
 					if(arr[i] && arr[i].constructor===Array){
-						mapping.resources[arr[i][0]]=arr[i][1];
+						mapping.resources[arr[i][1]]=arr[i][0];
 					}else mapping.resources[arr[i]]=j.base;
 				}
 				for(let i=0,arr=j.databases,obj=mapping.databases;i!==arr.length;++i){
