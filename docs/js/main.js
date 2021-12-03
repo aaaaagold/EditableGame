@@ -94,7 +94,11 @@ let booted=0,booting=()=>{
 			};
 			for(let x=jsonv.length,j;x--;){
 				j=jsonv[x];
-				for(let i=0,arr=j.resources;i!==arr.length;++i) mapping.resources[arr[i]]=j.base;
+				for(let i=0,arr=j.resources;i!==arr.length;++i){
+					if(arr[i] && arr[i].constructor===Array){
+						mapping.resources[arr[i][0]]=arr[i][1];
+					}else mapping.resources[arr[i]]=j.base;
+				}
 				for(let i=0,arr=j.databases,obj=mapping.databases;i!==arr.length;++i){
 					if(!obj[arr[i].name]) obj[arr[i].name]=[];
 					obj[arr[i].name].push([j.base,arr[i]]);
