@@ -88,7 +88,8 @@ let booted=0,booting=()=>{
 		jsonv.push(j);
 		if(j.from) addJson(url,j.from);
 		else{
-			let needLoad=jsonv.filter(j=>j.js).length,onloaded=()=>{
+			const jscnt=jsonv.filter(j=>j.js).length;
+			let needLoad=jscnt,onloaded=()=>{
 				if(--needLoad) return;
 				booting();
 			};
@@ -111,6 +112,7 @@ let booted=0,booting=()=>{
 			urlv.reverse();
 			console.log("Thanks for following external jsons. You can use 'window.urlv' to get the list.");
 			console.log(window.urlv=urlv);
+			if(!jscnt) booting();
 		}
 	});
 };
